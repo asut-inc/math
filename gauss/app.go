@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -23,10 +24,12 @@ type Gauss interface {
 }
 
 func (gi *GaussImpl) Solve() int {
-	return GaussMock{}.Solve()
+	gm := new(GaussMock)
+
+	return gm.Solve()
 }
 
-func NewGauss(matrixData [][]int, vector []float64) *Gauss {
+func NewGauss(matrixData [][]int, vector []float64) *GaussImpl {
 	var gaussData *GaussImpl
 
 	gaussData = &GaussImpl{
@@ -77,13 +80,17 @@ func MatrixMapper(matrix Matrix, matrixData [][]int) Matrix {
 }
 
 func newMatrix(matrixData [][]int) Matrix {
-	matrix := make(Matrix)
+	matrix := make(Matrix, len(matrixData))
 	matrix = MatrixMapper(matrix, matrixData)
 
 	return matrix
 }
 
 func main() {
+
+	gauss := NewGauss(MatrixData, []float64{-8, 11, 3})
+
+	fmt.Println(gauss.Matrix.GetCoordVal(1, 1))
 
 	//jsonFile, err := os.Open("input.json")
 	//if err != nil {
