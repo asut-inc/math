@@ -1,8 +1,12 @@
 package main
 
-type Gauss struct {
+type GaussImpl struct {
 	Matrix Matrix
 	Vector []float64
+}
+
+type Gauss interface {
+	Solve() int
 }
 
 type Coordinates struct {
@@ -18,37 +22,54 @@ var MatrixData [][]int = [][]int{
 	[]int{7, 8, 9},
 }
 
-func NewGauss(matrixData [][]int, vector []float64) *Gauss {
-	var gaussData *Gauss
-	rowsCount := len(matrixData)
-	columnsCount := len(matrixData[0])
-	gaussData = &Gauss{
-		Matrix: newMatrix(rowsCount, columnsCount),
+func NewGauss(matrixData [][]int, vector []float64) *GaussImpl {
+	var gaussData *GaussImpl
+
+	gaussData = &GaussImpl{
+		Matrix: newMatrix(matrixData),
 		Vector: vector,
 	}
 
 	return gaussData
 }
 
+func (m Matrix) PouringData(rowsCount int, columnsCount int, matrixData [][]int) {
+	for columnIdx := 0; columnIdx < columnsCount-1; columnIdx++ {
+		for rowIdx := 0; rowIdx < rowIdx-1; rowIdx++ {
+			m[Coordinates{x: columnIdx, y: rowIdx}] = matrixData[columnIdx][rowIdx]
+		}
+	}
+}
+
 func (m Matrix) getCoordVal(x int, y int) int {
 	return m[Coordinates{x, y}]
 }
 
-func (m Matrix) SetCoordVal(x int, y int, val int) int {
-	m[Coordinates{x: x, y: y}] = val
-
-	return val
+func NewCoord(x int, y int) *Coordinates {
+	return &Coordinates{x, y}
 }
 
-func newMatrix(rowCount int, columnCount int) Matrix {
-	matrix := make(Matrix)
+func (m Matrix) SetValue(coord *Coordinates, matrixValue int) {
+	m[*coord] = matrixValue
+}
 
-	for column := 0; column < columnCount-1; column++ {
-		for row := 0; row < rowCount-1; rowCount++ {
-			coord := Coordinates{x: column, y: row}
-			matrix[coord] = 0
+func MatrixMapper(matrix Matrix, matrixData [][]int) Matrix {
+	columnsCount := len(matrixData[0])
+	rowsCount := len(matrixData)
+
+	for columnIdx := 0; columnIdx < columnsCount-1; columnIdx++ {
+		for rowIdx := 0; rowIdx < rowsCount-1; rowsCount++ {
+			coord := NewCoord(columnIdx, rowIdx)
+			matrix.SetValue(coord, matrixData[columnIdx][rowIdx])
 		}
 	}
+
+	return matrix
+}
+
+func newMatrix(matrixData [][]int) Matrix {
+	matrix := make(Matrix)
+	matrix = MatrixMapper(matrix, matrixData)
 
 	return matrix
 }
