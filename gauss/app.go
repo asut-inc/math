@@ -1,28 +1,32 @@
 package main
 
+import (
+	"math/rand"
+	"time"
+)
+
 type GaussImpl struct {
 	Matrix Matrix
 	Vector []float64
+}
+
+type GaussMock struct{}
+
+func (gm *GaussMock) Solve() int {
+	rand.Seed(time.Now().Unix())
+
+	return rand.Intn(100)
 }
 
 type Gauss interface {
 	Solve() int
 }
 
-type Coordinates struct {
-	x int
-	y int
+func (gi *GaussImpl) Solve() int {
+	return GaussMock{}.Solve()
 }
 
-type Matrix map[Coordinates]int
-
-var MatrixData [][]int = [][]int{
-	[]int{1, 2, 3},
-	[]int{4, 5, 6},
-	[]int{7, 8, 9},
-}
-
-func NewGauss(matrixData [][]int, vector []float64) *GaussImpl {
+func NewGauss(matrixData [][]int, vector []float64) *Gauss {
 	var gaussData *GaussImpl
 
 	gaussData = &GaussImpl{
@@ -33,20 +37,25 @@ func NewGauss(matrixData [][]int, vector []float64) *GaussImpl {
 	return gaussData
 }
 
-func (m Matrix) PouringData(rowsCount int, columnsCount int, matrixData [][]int) {
-	for columnIdx := 0; columnIdx < columnsCount-1; columnIdx++ {
-		for rowIdx := 0; rowIdx < rowIdx-1; rowIdx++ {
-			m[Coordinates{x: columnIdx, y: rowIdx}] = matrixData[columnIdx][rowIdx]
-		}
-	}
-}
-
-func (m Matrix) getCoordVal(x int, y int) int {
-	return m[Coordinates{x, y}]
+type Coordinates struct {
+	x int
+	y int
 }
 
 func NewCoord(x int, y int) *Coordinates {
 	return &Coordinates{x, y}
+}
+
+type Matrix map[Coordinates]int
+
+var MatrixData [][]int = [][]int{
+	[]int{1, 2, 3},
+	[]int{4, 5, 6},
+	[]int{7, 8, 9},
+}
+
+func (m Matrix) GetCoordVal(x int, y int) int {
+	return m[Coordinates{x, y}]
 }
 
 func (m Matrix) SetValue(coord *Coordinates, matrixValue int) {
