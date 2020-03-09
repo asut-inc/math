@@ -12,20 +12,32 @@ type Coordinates struct {
 
 type Matrix map[Coordinates]int
 
-func NewGauss(rows int, column int, vector []float64) *Gauss {
+var MatrixData [][]int = [][]int{
+	[]int{1, 2, 3},
+	[]int{4, 5, 6},
+	[]int{7, 8, 9},
+}
+
+func NewGauss(matrixData [][]int, vector []float64) *Gauss {
 	var gaussData *Gauss
+	rowsCount := len(matrixData)
+	columnsCount := len(matrixData[0])
 	gaussData = &Gauss{
-		Matrix: newMatrix(rows, column),
+		Matrix: newMatrix(rowsCount, columnsCount),
 		Vector: vector,
 	}
 
 	return gaussData
 }
 
-func (m *Matrix) getCoordVal(x int, y int) int {
-	matrix := &m
+func (m Matrix) getCoordVal(x int, y int) int {
+	return m[Coordinates{x, y}]
+}
 
-	return matrix[Coordinates{x, y}]
+func (m Matrix) SetCoordVal(x int, y int, val int) int {
+	m[Coordinates{x: x, y: y}] = val
+
+	return val
 }
 
 func newMatrix(rowCount int, columnCount int) Matrix {
