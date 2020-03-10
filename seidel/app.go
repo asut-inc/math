@@ -13,12 +13,11 @@ type SLAU struct {
 	B []float64   `json:"b"`
 }
 
-var slau SLAU
-var p[]float64
-var x[]float64
-var eps float64 = 0.0001
-
 func main(){
+
+	var slau SLAU
+	var eps float64 = 0.0001
+
     jsonFile, err := os.Open("input.json")
     if err != nil {
         fmt.Println(err)
@@ -30,17 +29,20 @@ func main(){
 
 	json.Unmarshal(byteValue, &slau)
 
-	prepare() // привести к сходимому виду
+	prepare(&slau) // привести к сходимому виду
 	// Если в функции prepare условия сходимости не выполняются, нужно останавливать алгоритм
 
-	if solve() {
-		for i := 0; i < len(x); i++ {
-			fmt.Printf("x[%v]: %v \n", i+1, x[i])
-		}
+	x := solve(&slau, &eps)
+
+	for i := 0; i < len(x); i++ {
+		fmt.Printf("x[%v]: %v \n", i+1, x[i])
 	}
 }
 
-func solve() bool {
+func solve(slau *SLAU, eps *float64) []float64 {
+	var p[]float64
+	var x[]float64
+
 	for i := 0; i < len(slau.A); i++ {
 		x = append(x, 0.1)
 		p = append(p, 0.1)
@@ -61,22 +63,22 @@ func solve() bool {
 			x[i] = (slau.B[i] - sum) / slau.A[i][i]
 		}
 		
-		if converge(x, p) {
+		if converge(x, p, eps) {
 			break
 		}
 		
 	}
 
-	return true
+	return x
 }
 
-func converge(xk[] float64, xkp[] float64) bool {
+func converge(xk[] float64, xkp[] float64, eps *float64) bool {
     var norm float64 = 0
     for i := 0; i < len(xk); i++ {
         norm = norm + (xk[i] - xkp[i])*(xk[i] - xkp[i])
 	}
 	fmt.Println(math.Sqrt(norm))
-	return math.Sqrt(norm) < eps
+	return math.Sqrt(norm) < *eps
 }
 
 /*
@@ -84,7 +86,7 @@ func converge(xk[] float64, xkp[] float64) bool {
  * были не меньше сумм модулей всех остальных коэффициентов (преобладание диагональных элементов).
  * При этом хотя бы для одного уравнения неравенство (25) должно выполняться строго.
  */
-func prepare() {
+func prepare(slau *SLAU) {
 	for i:=0; i<len(slau.A); i++ {
 		var max float64 = 0
 		var maxkey int = 0
